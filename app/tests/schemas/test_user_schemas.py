@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Any
 
 import pytest
 from pydantic import ValidationError
@@ -6,7 +7,7 @@ from pydantic import ValidationError
 from app.schemas.user import UserCreate
 
 
-def test_valid_user_creation_payload(valid_user_payload: dict[str, object]) -> None:
+def test_valid_user_creation_payload(valid_user_payload: dict[str, Any]) -> None:
     payload = UserCreate(**valid_user_payload)
 
     assert payload.family_name == "Doe"
@@ -15,7 +16,7 @@ def test_valid_user_creation_payload(valid_user_payload: dict[str, object]) -> N
     assert str(payload.email) == "jane.doe@example.com"
 
 
-def test_invalid_user_email_is_rejected(valid_user_payload: dict[str, object]) -> None:
+def test_invalid_user_email_is_rejected(valid_user_payload: dict[str, Any]) -> None:
     payload = valid_user_payload.copy()
     payload["email"] = "not-an-email"
 
@@ -27,7 +28,7 @@ def test_invalid_user_email_is_rejected(valid_user_payload: dict[str, object]) -
 
 def test_missing_required_user_fields_are_rejected() -> None:
     with pytest.raises(ValidationError) as exc:
-        UserCreate(email="jane.doe@example.com")
+        UserCreate.model_validate({"email": "jane.doe@example.com"})
 
     error_message = str(exc.value)
     assert "family_name" in error_message

@@ -44,7 +44,9 @@ def test_grant_and_revoke_permission_success(
 ) -> None:
     user = _create_user(client, valid_user_json_payload)
     valid_permission_json_payload["user_id"] = user["id"]
-    permission_response = client.post("/api/permissions", json=valid_permission_json_payload)
+    permission_response = client.post(
+        "/api/permissions", json=valid_permission_json_payload
+    )
     permission_id = permission_response.json()["id"]
 
     assert permission_response.status_code == 201
@@ -55,7 +57,9 @@ def test_grant_and_revoke_permission_success(
     assert response.content == b""
 
 
-def test_delete_permissions_returns_404_for_missing_permission(client: TestClient) -> None:
+def test_delete_permissions_returns_404_for_missing_permission(
+    client: TestClient,
+) -> None:
     response = client.delete("/api/permissions/99999")
 
     assert response.status_code == 404

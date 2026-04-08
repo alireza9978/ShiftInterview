@@ -8,7 +8,9 @@ def test_get_users_returns_200(client: TestClient) -> None:
     assert response.json() == []
 
 
-def test_post_users_returns_201_with_valid_payload(client: TestClient, valid_user_json_payload) -> None:
+def test_post_users_returns_201_with_valid_payload(
+    client: TestClient, valid_user_json_payload
+) -> None:
     response = client.post("/api/users", json=valid_user_json_payload)
 
     assert response.status_code == 201
@@ -20,7 +22,9 @@ def test_post_users_returns_201_with_valid_payload(client: TestClient, valid_use
     assert data["email"] == valid_user_json_payload["email"]
 
 
-def test_post_users_returns_422_for_invalid_payload(client: TestClient, valid_user_json_payload) -> None:
+def test_post_users_returns_422_for_invalid_payload(
+    client: TestClient, valid_user_json_payload
+) -> None:
     valid_user_json_payload["email"] = "not-an-email"
 
     response = client.post("/api/users", json=valid_user_json_payload)
@@ -28,7 +32,9 @@ def test_post_users_returns_422_for_invalid_payload(client: TestClient, valid_us
     assert response.status_code == 422
 
 
-def test_get_user_returns_200_for_existing_user(client: TestClient, valid_user_json_payload) -> None:
+def test_get_user_returns_200_for_existing_user(
+    client: TestClient, valid_user_json_payload
+) -> None:
     create_response = client.post("/api/users", json=valid_user_json_payload)
     user_id = create_response.json()["id"]
 

@@ -71,4 +71,3 @@ def test_user_service_delete_user_not_found() -> None:
 
     with pytest.raises(UserNotFoundError):
         service.delete_user(1)
-
