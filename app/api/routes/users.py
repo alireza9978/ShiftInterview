@@ -9,9 +9,22 @@ from app.schemas.user import UserCreate
 router = APIRouter(prefix="/users", tags=["users"])
 
 
+def _get_user_or_404(user_id: int, db: Session) -> UserModel:
+    """Helper to fetch a user by ID or raise 404."""
+    user = db.get(UserModel, user_id)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return user
+
+
 @router.get("", response_model=list[UserSchema])
 def list_users(db: Session = Depends(get_db)) -> list[UserModel]:
     return db.query(UserModel).all()
+
+
+@router.get("/{user_id}", response_model=UserSchema)
+def get_user(user_id: int, db: Session = Depends(get_db)) -> UserModel:
+    return _get_user_or_404(user_id, db)
 
 
 @router.post("", response_model=UserSchema, status_code=status.HTTP_201_CREATED)
@@ -34,10 +47,7 @@ def add_user(payload: UserCreate, db: Session = Depends(get_db)) -> UserModel:
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_user(user_id: int, db: Session = Depends(get_db)) -> Response:
-    user = db.get(UserModel, user_id)
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
+    user = _get_user_or_404(user_id, db)
     db.delete(user)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
