@@ -11,7 +11,7 @@ def test_user_create_parses_required_fields() -> None:
     user = UserCreate(
         family_name="Doe",
         given_name="Jane",
-        birthdate="1990-01-02",
+        birthdate=date(1990, 1, 2),
         email="jane.doe@example.com",
     )
 
@@ -44,13 +44,13 @@ def test_user_create_rejects_invalid_email() -> None:
         UserCreate(
             family_name="Doe",
             given_name="Jane",
-            birthdate="1990-01-02",
+            birthdate=date(1990, 1, 2),
             email="not-an-email",
         )
 
 
 def test_permission_create_parses_required_fields() -> None:
-    permission = PermissionCreate(type="admin", granted_date="2026-04-08")
+    permission = PermissionCreate(type="admin", granted_date=date(2026, 4, 8))
 
     assert permission.type == "admin"
     assert permission.granted_date == date(2026, 4, 8)
