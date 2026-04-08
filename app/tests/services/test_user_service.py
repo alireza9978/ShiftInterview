@@ -12,7 +12,7 @@ def _build_user() -> User:
     return User(
         family_name="Doe",
         given_name="Jane",
-        birthdate=date(1990, 1, 2),
+        birth_date=date(1990, 1, 2),
         email="jane.doe@example.com",
     )
 
@@ -33,7 +33,7 @@ def test_user_service_create_user_success(valid_user_payload) -> None:
 
     assert result.family_name == created_user.family_name
     assert result.given_name == created_user.given_name
-    assert result.birthdate == created_user.birthdate
+    assert result.birth_date == created_user.birth_date
     assert result.email == created_user.email
     assert fetched is created_user
     repository.create.assert_called_once()

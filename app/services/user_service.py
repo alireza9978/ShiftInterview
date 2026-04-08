@@ -48,7 +48,7 @@ class UserService:
         user = User(
             family_name=payload.family_name,
             given_name=payload.given_name,
-            birthdate=payload.birthdate,
+            birth_date=payload.birth_date,
             email=str(payload.email),
         )
 

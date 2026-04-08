@@ -18,7 +18,7 @@ def test_post_users_returns_201_with_valid_payload(
     assert data["id"] > 0
     assert data["family_name"] == valid_user_json_payload["family_name"]
     assert data["given_name"] == valid_user_json_payload["given_name"]
-    assert data["birthdate"] == valid_user_json_payload["birthdate"]
+    assert data["birth_date"] == valid_user_json_payload["birth_date"]
     assert data["email"] == valid_user_json_payload["email"]
 
 

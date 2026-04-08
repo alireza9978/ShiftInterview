@@ -12,7 +12,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     family_name: Mapped[str] = mapped_column(String(255), nullable=False)
     given_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    birthdate: Mapped[date] = mapped_column(Date, nullable=False)
+    birth_date: Mapped[date] = mapped_column(Date, nullable=False)
     email: Mapped[str] = mapped_column(
         String(320), unique=True, index=True, nullable=False
     )

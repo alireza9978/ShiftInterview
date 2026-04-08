@@ -17,7 +17,7 @@ def _build_user() -> User:
     return User(
         family_name="Doe",
         given_name="Jane",
-        birthdate=date(1990, 1, 2),
+        birth_date=date(1990, 1, 2),
         email="jane.doe@example.com",
     )
 

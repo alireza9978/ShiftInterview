@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 class UserBase(BaseModel):
     family_name: str
     given_name: str
-    birthdate: date
+    birth_date: date
     email: EmailStr
 
 

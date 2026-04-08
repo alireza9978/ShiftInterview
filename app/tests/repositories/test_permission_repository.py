@@ -9,7 +9,7 @@ def test_permission_repository_create_list_by_user_and_delete(db_session) -> Non
     user = User(
         family_name="Doe",
         given_name="Jane",
-        birthdate=date(1990, 1, 2),
+        birth_date=date(1990, 1, 2),
         email="jane.doe@example.com",
     )
     db_session.add(user)
