@@ -70,3 +70,4 @@ clean:
 	find . -type d -name ".ruff_cache" -prune -exec rm -rf {} +
 	find . -type d -name ".mypy_cache" -prune -exec rm -rf {} +
 	find . -type d -name "*.egg-info" -prune -exec rm -rf {} +
+	find . -type d -name ".coverage" -prune -exec rm -rf {} +
