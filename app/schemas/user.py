@@ -14,6 +14,10 @@ class UserCreate(UserBase):
     pass
 
 
-class User(UserBase):
+class UserRead(UserBase):
     id: int
     model_config = ConfigDict(from_attributes=True)
+
+
+# Backward-compatible alias used in existing tests.
+User = UserRead

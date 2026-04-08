@@ -2,52 +2,77 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.models.user import User as UserModel
-from app.schemas.user import User as UserSchema
-from app.schemas.user import UserCreate
+from app.models.user import User
+from app.repositories.user_repository import UserRepository
+from app.schemas.user import UserCreate, UserRead
+from app.services.user_service import (
+    EmailAlreadyExistsError,
+    UserNotFoundError,
+    UserService,
+)
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-def _get_user_or_404(user_id: int, db: Session) -> UserModel:
-    """Helper to fetch a user by ID or raise 404."""
-    user = db.get(UserModel, user_id)
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    return user
+def get_user_service(db: Session = Depends(get_db)) -> UserService:
+    """
+    Dependency injection for UserService.
+    Creates service with repository for each request.
+    """
+    repository = UserRepository(db)
+    return UserService(repository=repository, db=db)
 
 
-@router.get("", response_model=list[UserSchema])
-def list_users(db: Session = Depends(get_db)) -> list[UserModel]:
-    return db.query(UserModel).all()
+@router.get("", response_model=list[UserRead])
+def list_users(service: UserService = Depends(get_user_service)) -> list[User]:
+    """
+    List all users.
+    """
+    return service.list_users()
 
 
-@router.get("/{user_id}", response_model=UserSchema)
-def get_user(user_id: int, db: Session = Depends(get_db)) -> UserModel:
-    return _get_user_or_404(user_id, db)
+@router.get("/{user_id}", response_model=UserRead)
+def get_user(user_id: int, service: UserService = Depends(get_user_service)) -> User:
+    """
+    Get a user by ID.
+    """
+    try:
+        return service.get_user(user_id)
+    except UserNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
 
 
-@router.post("", response_model=UserSchema, status_code=status.HTTP_201_CREATED)
-def add_user(payload: UserCreate, db: Session = Depends(get_db)) -> UserModel:
-    existing_user = db.query(UserModel).filter(UserModel.email == payload.email).first()
-    if existing_user is not None:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists")
-
-    user = UserModel(
-        family_name=payload.family_name,
-        given_name=payload.given_name,
-        birthdate=payload.birthdate,
-        email=payload.email,
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
+@router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+def add_user(
+    payload: UserCreate, service: UserService = Depends(get_user_service)
+) -> User:
+    """
+    Create a new user.
+    """
+    try:
+        return service.create_user(payload)
+    except EmailAlreadyExistsError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        ) from exc
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def remove_user(user_id: int, db: Session = Depends(get_db)) -> Response:
-    user = _get_user_or_404(user_id, db)
-    db.delete(user)
-    db.commit()
+def remove_user(
+    user_id: int, service: UserService = Depends(get_user_service)
+) -> Response:
+    """
+    Delete a user by ID.
+    """
+    try:
+        service.delete_user(user_id)
+    except UserNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
     return Response(status_code=status.HTTP_204_NO_CONTENT)
