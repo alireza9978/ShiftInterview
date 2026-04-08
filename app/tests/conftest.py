@@ -8,6 +8,8 @@ from sqlalchemy.pool import StaticPool
 
 from app.core.database import Base, get_db
 from app.main import app
+from app.tests.fixtures.permission_fixtures import *  # noqa: F403
+from app.tests.fixtures.user_fixtures import *  # noqa: F403
 
 
 @pytest.fixture()
