@@ -50,10 +50,11 @@ def test_user_create_rejects_invalid_email() -> None:
 
 
 def test_permission_create_parses_required_fields() -> None:
-    permission = PermissionCreate(type="admin", granted_date=date(2026, 4, 8))
+    permission = PermissionCreate(type="admin", granted_date=date(2026, 4, 8), user_id=1)
 
     assert permission.type == "admin"
     assert permission.granted_date == date(2026, 4, 8)
+    assert permission.user_id == 1
 
 
 def test_permission_model_supports_from_attributes() -> None:
@@ -62,9 +63,11 @@ def test_permission_model_supports_from_attributes() -> None:
             self.id = 99
             self.type = "admin"
             self.granted_date = date(2026, 4, 8)
+            self.user_id = 1
 
     permission = Permission.model_validate(PermissionRecord())
 
     assert permission.id == 99
     assert permission.type == "admin"
     assert permission.granted_date == date(2026, 4, 8)
+    assert permission.user_id == 1

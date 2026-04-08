@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict
 class PermissionBase(BaseModel):
     type: str
     granted_date: date
+    user_id: int
 
 
 class PermissionCreate(PermissionBase):
