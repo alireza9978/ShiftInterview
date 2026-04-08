@@ -71,3 +71,15 @@ def test_user_service_delete_user_not_found() -> None:
 
     with pytest.raises(UserNotFoundError):
         service.delete_user(1)
+
+
+def test_user_service_search_users_by_family_name() -> None:
+    repository = MagicMock()
+    matched_users = [_build_user()]
+    repository.search_by_family_name.return_value = matched_users
+    service = UserService(repository=repository, db=MagicMock())
+
+    result = service.search_users_by_family_name("Doe")
+
+    assert result == matched_users
+    repository.search_by_family_name.assert_called_once_with("Doe")

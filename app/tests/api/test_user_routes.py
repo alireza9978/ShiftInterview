@@ -66,3 +66,50 @@ def test_delete_user_returns_404_for_missing_user(client: TestClient) -> None:
 
     assert response.status_code == 404
     assert response.json() == {"detail": "User with ID 99999 not found"}
+
+
+def test_get_users_supports_search_by_family_name(client: TestClient) -> None:
+    client.post(
+        "/api/users",
+        json={
+            "family_name": "Doe",
+            "given_name": "Jane",
+            "birth_date": "1990-01-02",
+            "email": "jane.doe@example.com",
+        },
+    )
+    client.post(
+        "/api/users",
+        json={
+            "family_name": "Smith",
+            "given_name": "Ann",
+            "birth_date": "1992-03-04",
+            "email": "ann.smith@example.com",
+        },
+    )
+
+    response = client.get("/api/users?family_name=do")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["family_name"] == "Doe"
+
+
+def test_get_users_search_by_family_name_returns_empty_list_for_no_match(
+    client: TestClient,
+) -> None:
+    client.post(
+        "/api/users",
+        json={
+            "family_name": "Doe",
+            "given_name": "Jane",
+            "birth_date": "1990-01-02",
+            "email": "jane.doe@example.com",
+        },
+    )
+
+    response = client.get("/api/users?family_name=nonexistent")
+
+    assert response.status_code == 200
+    assert response.json() == []

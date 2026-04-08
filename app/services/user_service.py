@@ -30,6 +30,10 @@ class UserService:
         """Get all users."""
         return self.repository.list_all()
 
+    def search_users_by_family_name(self, family_name: str) -> list[User]:
+        """Search users by family name (case-insensitive)."""
+        return self.repository.search_by_family_name(family_name)
+
     def get_user(self, user_id: int) -> User:
         """Get a user by ID."""
         user = self.repository.get_by_id(user_id)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -24,10 +24,16 @@ def get_user_service(db: Session = Depends(get_db)) -> UserService:
 
 
 @router.get("", response_model=list[UserRead])
-def list_users(service: UserService = Depends(get_user_service)) -> list[User]:
+def list_users(
+    family_name: str | None = Query(default=None),
+    service: UserService = Depends(get_user_service),
+) -> list[User]:
     """
-    List all users.
+    List all users, optionally filtered by family name.
     """
+    if family_name is not None:
+        return service.search_users_by_family_name(family_name)
+
     return service.list_users()
 
 

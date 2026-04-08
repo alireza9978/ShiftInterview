@@ -18,6 +18,11 @@ class UserRepository:
         stmt = select(User)
         return list(self.db.scalars(stmt).all())
 
+    def search_by_family_name(self, family_name: str) -> list[User]:
+        """Fetch users whose family name matches the search text (case-insensitive)."""
+        stmt = select(User).where(User.family_name.ilike(f"%{family_name}%"))
+        return list(self.db.scalars(stmt).all())
+
     def get_by_id(self, user_id: int) -> User | None:
         """Fetch a user by ID. Returns None if not found."""
         return self.db.get(User, user_id)
