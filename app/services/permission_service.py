@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 
 from app.models.permission import Permission
-from app.models.user import User
 from app.repositories.permission_repository import PermissionRepository
+from app.repositories.user_repository import UserRepository
 from app.schemas.permission import PermissionCreate
 
 
@@ -23,8 +23,14 @@ class PermissionService:
     Service layer for Permission logic.
     """
 
-    def __init__(self, repository: PermissionRepository, db: Session) -> None:
+    def __init__(
+        self,
+        repository: PermissionRepository,
+        user_repository: UserRepository,
+        db: Session,
+    ) -> None:
         self.repository = repository
+        self.user_repository = user_repository
         self.db = db
 
     def list_permissions(self, user_id: int | None = None) -> list[Permission]:
@@ -51,7 +57,7 @@ class PermissionService:
         Create and Grant a permission to a user.
         """
         # user must exist
-        user = self.db.get(User, payload.user_id)
+        user = self.user_repository.get_by_id(payload.user_id)
         if user is None:
             raise UserNotFoundError(f"User with ID {payload.user_id} not found")
 

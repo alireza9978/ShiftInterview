@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.permission import Permission as PermissionModel
 from app.repositories.permission_repository import PermissionRepository
+from app.repositories.user_repository import UserRepository
 from app.schemas.permission import Permission, PermissionCreate
 from app.services.permission_service import (
     PermissionNotFoundError,
@@ -20,7 +21,12 @@ def get_permission_service(db: Session = Depends(get_db)) -> PermissionService:
     Creates service with repository for each request.
     """
     repository = PermissionRepository(db)
-    return PermissionService(repository=repository, db=db)
+    user_repository = UserRepository(db)
+    return PermissionService(
+        repository=repository,
+        user_repository=user_repository,
+        db=db,
+    )
 
 
 @router.get("", response_model=list[Permission])
