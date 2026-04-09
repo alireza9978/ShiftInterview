@@ -1,23 +1,42 @@
-In Python implement a REST API that models users and associated permissions.
+# ShiftInterview
 
-A user should have at least the following attributes:
+Simple FastAPI project to manage users and their permissions.
 
-family name
-given name
-birthdate
-email 
-A user's permission should have at least the following attributes:
+## What This Project Does
 
-type
-granted date
-The API should provide the endpoints to satisfy at least the following functional requirements:
+- Creates, lists, and deletes users.
+- Grants, lists, and revokes permissions.
+  - Create a permission and grants it to a user.
+- Supports user search by family name.
 
-list users
-add user
-remove user
-get user by id
-grant permission for a user
-revoke permission for a user
-search users by family name
+## Architecture
 
-The choice of frameworks and data stores are at your discretion. Please keep in mind that the purpose is not solely to provide a working solution. We are looking for candidates to demonstrate the principles and practices he/she feels are important in software engineering: dependency management, testing, project structure, data modelling, etc. A time commitment of around 4-5 hours for this should be sufficient (we hope, open to feedback of course) to check all the boxes.
+- `api/routes`: HTTP endpoints, request parsing, and response/error mapping.
+- `services`: business rules and use-case orchestration.
+- `repositories`: database access and query logic.
+- `models`: SQLAlchemy ORM entities (`User`, `Permission`).
+- `schemas`: Pydantic request/response contracts and validation.
+- `core`: app settings and database/session wiring.
+- `tests`: unit and API tests by layer.
+
+## How To Run (Make)
+
+From project root:
+
+```bash
+make install
+make run
+```
+
+Then open:
+
+- API docs: `http://localhost:8000/docs`
+- Health check: `http://localhost:8000/health`
+
+Useful commands:
+
+```bash
+make dev       # run with auto-reload
+make tests     # run tests
+make nice      # lint + format + typecheck
+```
