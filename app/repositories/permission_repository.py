@@ -27,6 +27,16 @@ class PermissionRepository:
         """Fetch a permission by ID. Returns None if not found."""
         return self.db.get(Permission, permission_id)
 
+    def get_by_user_and_type(
+        self, user_id: int, permission_type: str
+    ) -> Permission | None:
+        """Fetch a permission by user and type. Returns None if not found."""
+        stmt = select(Permission).where(
+            Permission.user_id == user_id,
+            Permission.type == permission_type,
+        )
+        return self.db.scalars(stmt).first()
+
     def create(self, permission: Permission) -> Permission:
         """
         Persist a permission and return the refreshed entity.

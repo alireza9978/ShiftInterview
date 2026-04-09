@@ -8,6 +8,7 @@ from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.schemas.permission import PermissionCreate
 from app.services.permission_service import (
+    DuplicatePermissionError,
     PermissionNotFoundError,
     PermissionService,
     UserNotFoundError,
@@ -36,6 +37,7 @@ def test_permission_service_grant_permission_success(valid_permission_payload) -
     created_permission = _build_permission()
     created_permission.id = 1
     repository.create.return_value = created_permission
+    repository.get_by_user_and_type.return_value = None
     user_repository = MagicMock(spec=UserRepository)
     user_repository.get_by_id.return_value = _build_user()
     service = PermissionService(
@@ -52,16 +54,35 @@ def test_permission_service_grant_permission_success(valid_permission_payload) -
 
 
 def test_permission_service_grant_permission_missing_user() -> None:
+    repository = MagicMock()
+    repository.get_by_user_and_type.return_value = None
     user_repository = MagicMock(spec=UserRepository)
     user_repository.get_by_id.return_value = None
     service = PermissionService(
-        repository=MagicMock(),
+        repository=repository,
         user_repository=user_repository,
     )
     payload = PermissionCreate(type="admin", granted_date=date(2026, 4, 8), user_id=99)
 
     with pytest.raises(UserNotFoundError):
         service.grant_permission(payload)
+
+
+def test_permission_service_grant_permission_duplicate_type_for_user() -> None:
+    repository = MagicMock()
+    repository.get_by_user_and_type.return_value = _build_permission()
+    user_repository = MagicMock(spec=UserRepository)
+    user_repository.get_by_id.return_value = _build_user()
+    service = PermissionService(
+        repository=repository,
+        user_repository=user_repository,
+    )
+    payload = PermissionCreate(type="admin", granted_date=date(2026, 4, 8), user_id=1)
+
+    with pytest.raises(DuplicatePermissionError):
+        service.grant_permission(payload)
+
+    repository.create.assert_not_called()
 
 
 def test_permission_service_revoke_permission_success() -> None:

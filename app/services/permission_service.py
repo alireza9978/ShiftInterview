@@ -16,6 +16,12 @@ class UserNotFoundError(Exception):
     pass
 
 
+class DuplicatePermissionError(Exception):
+    """Raised when trying to grant a duplicate permission type to the same user."""
+
+    pass
+
+
 class PermissionService:
     """
     Service layer for Permission logic.
@@ -56,6 +62,15 @@ class PermissionService:
         user = self.user_repository.get_by_id(payload.user_id)
         if user is None:
             raise UserNotFoundError(f"User with ID {payload.user_id} not found")
+
+        existing_permission = self.repository.get_by_user_and_type(
+            payload.user_id,
+            payload.type,
+        )
+        if existing_permission is not None:
+            raise DuplicatePermissionError(
+                f"User with ID {payload.user_id} already has permission type '{payload.type}'"
+            )
 
         # Create new Permission model from validated schema data
         permission = Permission(

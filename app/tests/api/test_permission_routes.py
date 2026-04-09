@@ -37,6 +37,50 @@ def test_post_permissions_returns_404_if_user_does_not_exist(
     assert response.json() == {"detail": "User with ID 99999 not found"}
 
 
+def test_post_permissions_returns_201_for_multiple_distinct_types_same_user(
+    client: TestClient,
+    valid_user_json_payload,
+) -> None:
+    user = _create_user(client, valid_user_json_payload)
+
+    first_payload = {
+        "type": "admin",
+        "granted_date": "2026-04-08",
+        "user_id": user["id"],
+    }
+    second_payload = {
+        "type": "reader",
+        "granted_date": "2026-04-09",
+        "user_id": user["id"],
+    }
+
+    first_response = client.post("/api/permissions", json=first_payload)
+    second_response = client.post("/api/permissions", json=second_payload)
+
+    assert first_response.status_code == 201
+    assert second_response.status_code == 201
+
+
+def test_post_permissions_returns_409_for_duplicate_type_same_user(
+    client: TestClient,
+    valid_user_json_payload,
+    valid_permission_json_payload,
+) -> None:
+    user = _create_user(client, valid_user_json_payload)
+    valid_permission_json_payload["user_id"] = user["id"]
+
+    first_response = client.post("/api/permissions", json=valid_permission_json_payload)
+    second_response = client.post(
+        "/api/permissions", json=valid_permission_json_payload
+    )
+
+    assert first_response.status_code == 201
+    assert second_response.status_code == 409
+    assert second_response.json() == {
+        "detail": "User with ID 1 already has permission type 'admin'"
+    }
+
+
 def test_grant_and_revoke_permission_success(
     client: TestClient,
     valid_user_json_payload,
