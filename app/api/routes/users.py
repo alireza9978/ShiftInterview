@@ -20,7 +20,7 @@ def get_user_service(db: Session = Depends(get_db)) -> UserService:
     Creates service with repository for each request.
     """
     repository = UserRepository(db)
-    return UserService(repository=repository, db=db)
+    return UserService(repository=repository)
 
 
 @router.get("", response_model=list[UserRead])

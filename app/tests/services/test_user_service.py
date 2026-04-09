@@ -21,12 +21,11 @@ def test_user_service_create_user_success(valid_user_payload) -> None:
     repository = MagicMock()
     repository.get_by_email.return_value = None
     created_user = _build_user()
+    created_user.id = 1
+    repository.create.return_value = created_user
     repository.get_by_id.return_value = created_user
-    db = MagicMock()
-    service = UserService(repository=repository, db=db)
+    service = UserService(repository=repository)
     payload = UserCreate(**valid_user_payload)
-
-    db.refresh.return_value = None
 
     result = service.create_user(payload)
     fetched = service.get_user(1)
@@ -38,14 +37,12 @@ def test_user_service_create_user_success(valid_user_payload) -> None:
     assert fetched is created_user
     repository.create.assert_called_once()
     repository.get_by_id.assert_called_once_with(1)
-    db.commit.assert_called_once()
-    db.refresh.assert_called_once_with(repository.create.call_args.args[0])
 
 
 def test_user_service_get_user_not_found() -> None:
     repository = MagicMock()
     repository.get_by_id.return_value = None
-    service = UserService(repository=repository, db=MagicMock())
+    service = UserService(repository=repository)
 
     with pytest.raises(UserNotFoundError):
         service.get_user(1)
@@ -55,19 +52,17 @@ def test_user_service_delete_user_success() -> None:
     user = _build_user()
     repository = MagicMock()
     repository.get_by_id.return_value = user
-    db = MagicMock()
-    service = UserService(repository=repository, db=db)
+    service = UserService(repository=repository)
 
     service.delete_user(1)
 
     repository.delete.assert_called_once_with(user)
-    db.commit.assert_called_once()
 
 
 def test_user_service_delete_user_not_found() -> None:
     repository = MagicMock()
     repository.get_by_id.return_value = None
-    service = UserService(repository=repository, db=MagicMock())
+    service = UserService(repository=repository)
 
     with pytest.raises(UserNotFoundError):
         service.delete_user(1)
@@ -77,7 +72,7 @@ def test_user_service_search_users_by_family_name() -> None:
     repository = MagicMock()
     matched_users = [_build_user()]
     repository.search_by_family_name.return_value = matched_users
-    service = UserService(repository=repository, db=MagicMock())
+    service = UserService(repository=repository)
 
     result = service.search_users_by_family_name("Doe")
 

@@ -32,16 +32,15 @@ def _build_permission() -> Permission:
 
 
 def test_permission_service_grant_permission_success(valid_permission_payload) -> None:
-    db = MagicMock()
-    db.refresh.return_value = None
     repository = MagicMock()
-    repository.create.return_value = _build_permission()
+    created_permission = _build_permission()
+    created_permission.id = 1
+    repository.create.return_value = created_permission
     user_repository = MagicMock(spec=UserRepository)
     user_repository.get_by_id.return_value = _build_user()
     service = PermissionService(
         repository=repository,
         user_repository=user_repository,
-        db=db,
     )
     payload = PermissionCreate(**valid_permission_payload)
 
@@ -50,17 +49,14 @@ def test_permission_service_grant_permission_success(valid_permission_payload) -
     assert result.user_id == 1
     repository.create.assert_called_once()
     user_repository.get_by_id.assert_called_once_with(1)
-    db.commit.assert_called_once()
 
 
 def test_permission_service_grant_permission_missing_user() -> None:
-    db = MagicMock()
     user_repository = MagicMock(spec=UserRepository)
     user_repository.get_by_id.return_value = None
     service = PermissionService(
         repository=MagicMock(),
         user_repository=user_repository,
-        db=db,
     )
     payload = PermissionCreate(type="admin", granted_date=date(2026, 4, 8), user_id=99)
 
@@ -72,17 +68,14 @@ def test_permission_service_revoke_permission_success() -> None:
     permission = _build_permission()
     repository = MagicMock()
     repository.get_by_id.return_value = permission
-    db = MagicMock()
     service = PermissionService(
         repository=repository,
         user_repository=MagicMock(spec=UserRepository),
-        db=db,
     )
 
     service.revoke_permission(1)
 
     repository.delete.assert_called_once_with(permission)
-    db.commit.assert_called_once()
 
 
 def test_permission_service_revoke_permission_not_found() -> None:
@@ -91,7 +84,6 @@ def test_permission_service_revoke_permission_not_found() -> None:
     service = PermissionService(
         repository=repository,
         user_repository=MagicMock(spec=UserRepository),
-        db=MagicMock(),
     )
 
     with pytest.raises(PermissionNotFoundError):

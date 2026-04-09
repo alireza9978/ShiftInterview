@@ -1,5 +1,3 @@
-from sqlalchemy.orm import Session
-
 from app.models.permission import Permission
 from app.repositories.permission_repository import PermissionRepository
 from app.repositories.user_repository import UserRepository
@@ -27,11 +25,9 @@ class PermissionService:
         self,
         repository: PermissionRepository,
         user_repository: UserRepository,
-        db: Session,
     ) -> None:
         self.repository = repository
         self.user_repository = user_repository
-        self.db = db
 
     def list_permissions(self, user_id: int | None = None) -> list[Permission]:
         """
@@ -69,10 +65,7 @@ class PermissionService:
         )
 
         # Persist to database
-        self.repository.create(permission)
-        self.db.commit()
-        self.db.refresh(permission)
-        return permission
+        return self.repository.create(permission)
 
     def revoke_permission(self, permission_id: int) -> None:
         """
@@ -85,4 +78,3 @@ class PermissionService:
             )
 
         self.repository.delete(permission)
-        self.db.commit()

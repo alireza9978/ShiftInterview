@@ -1,5 +1,3 @@
-from sqlalchemy.orm import Session
-
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate
@@ -22,9 +20,8 @@ class UserService:
     Service layer for User logic.
     """
 
-    def __init__(self, repository: UserRepository, db: Session) -> None:
+    def __init__(self, repository: UserRepository) -> None:
         self.repository = repository
-        self.db = db
 
     def list_users(self) -> list[User]:
         """Get all users."""
@@ -57,10 +54,7 @@ class UserService:
         )
 
         # Persist to database
-        self.repository.create(user)
-        self.db.commit()
-        self.db.refresh(user)
-        return user
+        return self.repository.create(user)
 
     def delete_user(self, user_id: int) -> None:
         """
@@ -71,4 +65,3 @@ class UserService:
             raise UserNotFoundError(f"User with ID {user_id} not found")
 
         self.repository.delete(user)
-        self.db.commit()

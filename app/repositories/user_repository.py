@@ -34,13 +34,16 @@ class UserRepository:
 
     def create(self, user: User) -> User:
         """
-        Add a user to the database session.
+        Persist a user and return the refreshed entity.
         """
         self.db.add(user)
+        self.db.commit()
+        self.db.refresh(user)
         return user
 
     def delete(self, user: User) -> None:
         """
-        Mark a user for deletion in the database session.
+        Delete a user and commit the transaction.
         """
         self.db.delete(user)
+        self.db.commit()

@@ -29,13 +29,16 @@ class PermissionRepository:
 
     def create(self, permission: Permission) -> Permission:
         """
-        Add a permission to the database session.
+        Persist a permission and return the refreshed entity.
         """
         self.db.add(permission)
+        self.db.commit()
+        self.db.refresh(permission)
         return permission
 
     def delete(self, permission: Permission) -> None:
         """
-        Mark a permission for deletion in the database session.
+        Delete a permission and commit the transaction.
         """
         self.db.delete(permission)
+        self.db.commit()

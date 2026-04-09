@@ -25,7 +25,6 @@ def get_permission_service(db: Session = Depends(get_db)) -> PermissionService:
     return PermissionService(
         repository=repository,
         user_repository=user_repository,
-        db=db,
     )
 
 
