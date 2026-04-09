@@ -31,6 +31,7 @@ make run
 Then open:
 
 - API docs: `http://localhost:8000/docs`
+- Postman Collection: [Link](https://lively-zodiac-203348.postman.co/workspace/My-Workspace~95ddfeff-4182-4331-8235-29ad019898e1/collection/25453922-80c96f7f-85bd-49b4-a72e-af7b414bd2de?action=share&source=copy-link&creator=25453922)
 - Health check: `http://localhost:8000/health`
 
 Useful commands:
