@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import Date, ForeignKey, String
+from sqlalchemy import Date, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -8,6 +8,9 @@ from app.core.database import Base
 
 class Permission(Base):
     __tablename__ = "permissions"
+    __table_args__ = (
+        UniqueConstraint("user_id", "type", name="uq_permission_user_type"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     type: Mapped[str] = mapped_column(String(100), nullable=False)
